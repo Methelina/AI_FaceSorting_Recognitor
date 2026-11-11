@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# virtual environment (created by installer, not committed)
+face_env/
+
+# downloaded models (large, restored by download_models.py)
+models/
+models/models/
+*.onnx
+*.zip
+*.part
+
+# caches (uv / tmp / huggingface)
+.cache/
+
+# uv binary (installer downloads/copies it itself)
+uv.exe
+uvx.exe
+
+# runtime artifacts
+*.log
+*.old
+*.new/
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
