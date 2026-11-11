@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""find_faces.py — найти фото конкретного человека по образцам лица и перенести
-их в отдельную папку.
+"""find_faces.py - find photos of a specific person by face samples
+and move them to a separate folder.
 
-Проект: K:\\work\\AI\\AI_FaceRecognitor (портативная среда, README.md)
+Project: K:\\work\\AI\\AI_FaceRecognitor (portable env, see readme.md)
 
-Запуск через лаунчер:
+Run via launcher:
   K:\\work\\AI\\AI_FaceRecognitor\\run_faces.ps1 --search-dir ... --target-dir ... --samples ...
+
+Run without arguments for the interactive menu.
 """
 import argparse
 import os
@@ -17,8 +19,8 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-# модели ищутся: 1) --model-root  2) models\ рядом со скриптом
-#                3) сборка ComfyUI (только чтение, если есть)
+# model lookup order: 1) --model-root  2) models\ next to project root
+#                     3) ComfyUI install (read-only, if present)
 IMG_EXT = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
 
 
@@ -26,7 +28,7 @@ def resolve_model_root(arg_value: str | None) -> str:
     candidates = []
     if arg_value:
         candidates.append(arg_value)
-    # models\ в корне проекта (скрипт лежит в src\)
+    # models\ in the project root (this script lives in src\)
     here = os.path.dirname(os.path.abspath(__file__))
     candidates.append(os.path.join(os.path.dirname(here), "models"))
     candidates.append(
@@ -34,7 +36,7 @@ def resolve_model_root(arg_value: str | None) -> str:
     for c in candidates:
         if c and os.path.isdir(os.path.join(c, "models", "buffalo_l")):
             return c
-    # ничего не нашли — вернуть первый (insightface сам скачает модели туда)
+    # nothing found - return default (insightface downloads models there)
     return candidates[1]
 
 
@@ -62,13 +64,13 @@ def build_argparser() -> argparse.ArgumentParser:
                    help="do not move/copy anything, only show counters")
     p.add_argument("--model-root", default=None,
                    help="insightface models folder (default: models\\ next "
-                        "to the script)")
+                        "to the project root)")
     return p
 
 
 def expand_samples(samples_arg: str, search_dir: str) -> list[str]:
-    """--samples может быть папкой (все картинки в ней) или списком файлов
-    через запятую. Различаем по факту существования пути как папки."""
+    """--samples may be a folder (all images in it) or a comma-separated
+    file list. Distinguished by whether the path exists as a folder."""
     if os.path.isdir(samples_arg):
         imgs = []
         for name in sorted(os.listdir(samples_arg)):
@@ -79,7 +81,7 @@ def expand_samples(samples_arg: str, search_dir: str) -> list[str]:
         print(f"[SAMPLES] Folder mode: {len(imgs)} image(s) in "
               f"'{samples_arg}'")
         return imgs
-    # список файлов через запятую (относительные имена — от search-dir)
+    # comma-separated file list (relative names resolve against search-dir)
     out = []
     for s in samples_arg.split(","):
         s = s.strip().strip('"')
@@ -90,18 +92,27 @@ def expand_samples(samples_arg: str, search_dir: str) -> list[str]:
     return out
 
 
+def collect_images(search_dir: str) -> list[str]:
+    out = []
+    for name in sorted(os.listdir(search_dir)):
+        full = os.path.join(search_dir, name)
+        if os.path.isfile(full) and os.path.splitext(name)[1].lower() in IMG_EXT:
+            out.append(full)
+    return out
+
+
 def ask_dir(prompt: str, must_exist: bool) -> str:
     while True:
         p = input(prompt).strip().strip('"')
         if must_exist and not os.path.isdir(p):
-            print(f"  [!] Folder not found: {p} — try again.")
+            print(f"  [!] Folder not found: {p} - try again.")
             continue
         return p
 
 
 def interactive_menu(args) -> None:
-    """Английское интерактивное меню — запускается, когда аргументы
-    --search-dir/--target-dir/--samples не заданы."""
+    """English interactive menu - runs when --search-dir/--target-dir/
+    --samples are not given."""
     print("=" * 60)
     print("  AI FaceRecognitor - interactive setup")
     print("=" * 60)
@@ -124,7 +135,7 @@ def interactive_menu(args) -> None:
                     for x in s.split(",")):
                 args.samples = s
                 break
-            print(f"  [!] Path(s) not found: {s} — try again.")
+            print(f"  [!] Path(s) not found: {s} - try again.")
     t = input(
         f"     Similarity threshold [{args.threshold}] (Enter = keep): "
     ).strip()
@@ -135,21 +146,12 @@ def interactive_menu(args) -> None:
             print(f"  [!] Not a number - keeping {args.threshold}")
 
 
-def collect_images(search_dir: str) -> list[str]:
-    out = []
-    for name in sorted(os.listdir(search_dir)):
-        full = os.path.join(search_dir, name)
-        if os.path.isfile(full) and os.path.splitext(name)[1].lower() in IMG_EXT:
-            out.append(full)
-    return out
-
-
 def main() -> None:
     args = build_argparser().parse_args()
     if (args.search_dir is None and args.target_dir is None
             and args.samples is None):
         interactive_menu(args)
-    # после меню аргументы обязаны быть на месте
+    # after the menu the arguments must be in place
     missing = [a for a, v in (("--search-dir", args.search_dir),
                               ("--target-dir", args.target_dir),
                               ("--samples", args.samples)) if not v]
@@ -161,9 +163,9 @@ def main() -> None:
     from insightface.app import FaceAnalysis
     import onnxruntime as ort
 
-    # CUDA 12 DLL: Windows — torch\lib через add_dll_directory/PATH;
-    # Linux — torch и nvidia-*-cu12 пакеты через LD_LIBRARY_PATH.
-    # site-packages берём из sys.path — путь верный на любой ОС и venv.
+    # CUDA 12 DLLs: Windows - torch\lib via add_dll_directory/PATH;
+    # Linux - torch and nvidia-*-cu12 packages via LD_LIBRARY_PATH.
+    # site-packages taken from sys.path - correct on any OS and venv.
     site_dirs = [p for p in sys.path
                  if p and os.path.isdir(p)
                  and os.path.basename(p) in ("site-packages", "dist-packages")]
@@ -174,7 +176,7 @@ def main() -> None:
                      os.path.join(s, "nvidia", "cublas", "lib"),
                      os.path.join(s, "nvidia", "cufft", "lib"),
                      os.path.join(s, "nvidia", "cudnn", "lib")]
-    # Windows-only fallback: torch из сборки ComfyUI (только чтение)
+    # Windows-only fallback: torch from the ComfyUI install (read-only)
     dll_dirs.append(
         r"K:\work\AI\Comfy_UI_Trellis2\Reposit\comfy_env\Lib\site-packages\torch\lib")
     for dll_dir in dll_dirs:
@@ -185,40 +187,41 @@ def main() -> None:
             os.environ["LD_LIBRARY_PATH"] = (dll_dir + os.pathsep
                                              + os.environ.get("LD_LIBRARY_PATH", ""))
 
-    # Универсальный трюк для обеих ОС: import torch загружает CUDA 12
-    # библиотеки в память процесса, и onnxruntime находит их по именам
-    # уже загруженными (на Linux LD_LIBRARY_PATH, выставленный после
-    # старта процесса, для dlopen-зависимостей не работает).
+    # Universal trick for both OSes: importing torch loads CUDA 12
+    # libraries into the process, and onnxruntime finds them by name
+    # already loaded (on Linux an LD_LIBRARY_PATH set after process start
+    # does not work for dlopen dependencies).
     try:
         import torch  # noqa: F401
     except Exception as e:
-        print(f"[WARN] torch не импортировался ({e}) — "
-              f"если CUDA-провайдер не загрузится, будет CPU")
+        print(f"[WARN] torch failed to import ({e}) - "
+              f"if the CUDA provider does not load, CPU will be used")
 
-    # GPU (CUDA) если доступен, иначе честный откат на CPU
+    # GPU (CUDA) if available, otherwise an honest fallback to CPU
     available = ort.get_available_providers()
     if "CUDAExecutionProvider" in available:
         providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
         device = "GPU (CUDA)"
     else:
         providers = ["CPUExecutionProvider"]
-        device = "CPU (onnxruntime-gpu не установлен или DLL не совпали)"
-    print(f"Устройство вывода: {device}")
-    print(f"Провайдеры onnxruntime: {available}")
-    print(f"Модели: {model_root}")
+        device = "CPU (onnxruntime-gpu not installed or DLLs mismatch)"
+    print(f"Device: {device}")
+    print(f"onnxruntime providers: {available}")
+    print(f"Models: {model_root}")
 
     app = FaceAnalysis(name="buffalo_l", root=model_root,
                        providers=providers)
-    # проверка, что CUDA-провайдер реально загрузился, а не упал в CPU
+    # check that the CUDA provider actually loaded instead of silently
+    # falling back to CPU
     active = app.models["det_10g"].session.get_providers()[0] \
         if "det_10g" in app.models else providers[0]
     if active != "CUDAExecutionProvider" and "CUDAExecutionProvider" in available:
-        print("[ВНИМАНИЕ] CUDA-провайдер заявлен, но не загрузился — "
-              "работает CPU. Сверьте версию onnxruntime-gpu с CUDA торов "
-              "(см. инструкцию).")
+        print("[WARNING] CUDA provider was listed but failed to load - "
+              "running on CPU. Check the onnxruntime-gpu / torch CUDA "
+              "version match (see readme).")
     app.prepare(ctx_id=0, det_size=(args.det_size, args.det_size))
 
-    # --- образцы лица -> средний эмбеддинг -------------------------------
+    # --- face samples -> mean embedding ----------------------------------
     sample_paths = expand_samples(args.samples, args.search_dir)
     if not sample_paths:
         sys.exit("No sample images found (--samples).")
@@ -227,35 +230,35 @@ def main() -> None:
     for path in sample_paths:
         img = cv2.imread(path)
         if img is None:
-            print(f"[ВНИМАНИЕ] образец не читается, пропущен: {path}")
+            print(f"[WARNING] unreadable sample, skipped: {path}")
             continue
         faces = app.get(img)
         if not faces:
-            print(f"[ВНИМАНИЕ] лицо в образце не найдено: {path}")
+            print(f"[WARNING] no face found in sample: {path}")
             continue
         best = max(faces, key=lambda f: (f.bbox[2] - f.bbox[0]) *
                                         (f.bbox[3] - f.bbox[1]))
         refs.append(best.normed_embedding)
-        print(f"образец OK: {os.path.basename(path)} "
-              f"(лиц: {len(faces)}, взято крупнейшее)")
+        print(f"sample OK: {os.path.basename(path)} "
+              f"(faces: {len(faces)}, largest taken)")
     if not refs:
-        sys.exit("Ни в одном образце не найдено лицо — работать не с чем.")
+        sys.exit("No face found in any sample - nothing to work with.")
 
     ref_mean = np.mean(np.stack(refs), axis=0)
     ref_mean /= np.linalg.norm(ref_mean)
 
-    # --- основной проход ---------------------------------------------------
+    # --- main pass ---------------------------------------------------------
     images = collect_images(args.search_dir)
-    print(f"\nИзображений в {args.search_dir}: {len(images)}")
-    print(f"Порог сходства: {args.threshold}\n")
+    print(f"\nImages in {args.search_dir}: {len(images)}")
+    print(f"Similarity threshold: {args.threshold}\n")
 
     os.makedirs(args.target_dir, exist_ok=True)
-    # совпавшие -> target-dir; НЕсовпавшие остаются на месте
+    # matched -> target-dir; non-matched stay in place
 
     matched = rejected = noface = unreadable = moved = 0
     matched_files = []
 
-    bar = tqdm(images, desc="Проверка", unit="img", ncols=100,
+    bar = tqdm(images, desc="Scanning", unit="img", ncols=100,
                dynamic_ncols=True)
     for path in bar:
         try:
@@ -292,18 +295,18 @@ def main() -> None:
                 moved += 1
         else:
             rejected += 1
-        bar.set_postfix(совпало=matched, мимо=rejected, без_лиц=noface)
+        bar.set_postfix(matched=matched, missed=rejected, no_face=noface)
 
     bar.close()
-    print("\n========== ИТОГ ==========")
-    print(f"Всего проверено : {len(images)}")
-    print(f"Совпало         : {matched}" +
-          (f" (перенесено: {moved})" if not args.dry_run else " (dry-run)"))
-    print(f"Не совпало      : {rejected}")
-    print(f"Лиц не найдено  : {noface}")
-    print(f"Не читается     : {unreadable}")
+    print("\n========== SUMMARY ==========")
+    print(f"Total checked   : {len(images)}")
+    print(f"Matched         : {matched}" +
+          (f" (moved: {moved})" if not args.dry_run else " (dry-run)"))
+    print(f"Not matched     : {rejected}")
+    print(f"No faces found  : {noface}")
+    print(f"Unreadable      : {unreadable}")
     if matched_files:
-        print("\nСовпавшие (имя: сходство):")
+        print("\nMatched (name: similarity):")
         for path, sim in matched_files:
             print(f"  {os.path.basename(path)}: {sim:.3f}")
 
@@ -315,4 +318,4 @@ if __name__ == "__main__":
         except Exception:
             pass
     main()
-    input("\nНажмите Enter для закрытия...")
+    input("\nPress Enter to close...")

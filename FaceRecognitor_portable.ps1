@@ -154,8 +154,8 @@ $pkgs = @(
     @{ name = "opencv-python";      module = "cv2" },
     @{ name = "tqdm";               module = "tqdm" },
     @{ name = "numpy";              module = "numpy" },
-    # insightface 2.1 использует устаревший skimage API (Transform.estimate):
-    # в scikit-image >= 0.26 это FutureWarning, в 2.2 будет поломка - пин ниже
+    # insightface 2.1 uses the deprecated skimage Transform.estimate API:
+    # FutureWarning on scikit-image >= 0.26, hard break on 2.2 - pin below
     @{ name = '"scikit-image<0.26"'; module = "skimage" },
     @{ name = "pycurl";             module = "curl" }   # vendored wheel below
 )

@@ -47,7 +47,7 @@ stages are skipped, nothing breaks, nothing re-downloads.
 need cmd/shell and internet — uv downloads Python itself, everything else
 is installed by the installer.
 
-Русская версия: [readme.ru.md](readme.ru.md)
+Russian version: [readme.ru.md](readme.ru.md)
 
 ## Layout
 
