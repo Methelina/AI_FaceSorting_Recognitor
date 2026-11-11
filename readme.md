@@ -1,6 +1,6 @@
 # AI_FaceRecognitor
 
-## What it is and who it is for (plain language)
+## What it is and who it is for
 
 This is a program that **sorts photos by the people in them**. You show it
 a few photos of a person ("samples"), point it at a folder of images — and
