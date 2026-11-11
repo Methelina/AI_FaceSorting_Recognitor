@@ -179,11 +179,11 @@ foreach ($p in $pkgs) {
     if ($rc -ne 0) { Write-Status "Failed: $($p.name)" "ERROR"; exit 1 }
 }
 
-# === 4. InsightFace models (download_models.py is idempotent) ===
+# === 4. InsightFace models (src/download_models.py is idempotent) ===
 Write-Step "Checking insightface models buffalo_l (pycurl download if missing)..." 4 5
-& $PythonExePath (Join-Path $ScriptPath "download_models.py")
+& $PythonExePath (Join-Path $ScriptPath "src/download_models.py")
 if ($LASTEXITCODE -ne 0) {
-    Write-Status "Model download failed - run download_models.py later to retry." "ERROR"
+    Write-Status "Model download failed - run src/download_models.py later to retry." "ERROR"
     exit 1
 }
 

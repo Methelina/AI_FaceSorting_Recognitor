@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================
 rem  AI_FaceRecognitor - Runtime launcher (mirror of run_faces.ps1)
-rem  All arguments are passed to find_faces.py as-is, e.g.:
+rem  All arguments are passed to src/find_faces.py as-is, e.g.:
 rem    run_faces.bat --search-dir O:\pics --target-dir O:\pics\person --samples "a.jpg,b.jpg"
 rem    run_faces.bat --help
 rem ============================================================
@@ -26,7 +26,7 @@ set "CUDA_VISIBLE_DEVICES=0"
 set "PYTHONIOENCODING=utf-8"
 if not exist "%TMP%" mkdir "%TMP%" >nul 2>&1
 
-"%SCRIPT_DIR%face_env\Scripts\python.exe" "%SCRIPT_DIR%find_faces.py" %*
+"%SCRIPT_DIR%face_env\Scripts\python.exe" "%SCRIPT_DIR%src/find_faces.py" %*
 
 set "EC=%ERRORLEVEL%"
 echo.

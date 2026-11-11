@@ -22,7 +22,7 @@ import shutil
 import sys
 import zipfile
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # project root
 MODELS_BASE = os.path.join(ROOT, "models", "models")
 API_RELEASES = "https://api.github.com/repos/deepinsight/insightface/releases"
 JINA_RELEASES = "https://r.jina.ai/https://github.com/deepinsight/insightface/releases"

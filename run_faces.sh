@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================
 #  AI_FaceRecognitor - Runtime launcher (Linux mirror of run_faces.bat)
-#  All arguments are passed to find_faces.py as-is, e.g.:
+#  All arguments are passed to src/find_faces.py as-is, e.g.:
 #    ./run_faces.sh --search-dir /path/pics --target-dir /path/pics/person --samples "a.jpg,b.jpg"
 # ============================================================
 set -uo pipefail
@@ -30,4 +30,4 @@ for d in "$SITE/torch/lib" \
     [[ -d "$d" ]] && export LD_LIBRARY_PATH="$d:${LD_LIBRARY_PATH:-}"
 done
 
-exec "$SCRIPT_DIR/face_env/bin/python" "$SCRIPT_DIR/find_faces.py" "$@"
+exec "$SCRIPT_DIR/face_env/bin/python" "$SCRIPT_DIR/src/find_faces.py" "$@"

@@ -62,8 +62,8 @@ for your OS: `FaceRecognitor_portable` — install, `run_faces` — run.
 
 | Shared | Purpose |
 |---|---|
-| `download_models.py` | Model install/update, opera-proxy style: a parser chain (GitHub API → r.jina.ai → hardcoded mirrors) finds `<model>.zip` in the freshest release, versions compared via `manifest.json`, offline mode, pycurl download (retries + resume), staging extraction and atomic replacement with rollback. Standalone: `face_env\Scripts\python.exe download_models.py [--model buffalo_l] [--force]` |
-| `find_faces.py` | The search/sort script itself (cross-platform; locates CUDA libraries on both Windows and Linux) |
+| `src/download_models.py` | Model install/update, opera-proxy style: a parser chain (GitHub API → r.jina.ai → hardcoded mirrors) finds `<model>.zip` in the freshest release, versions compared via `manifest.json`, offline mode, pycurl download (retries + resume), staging extraction and atomic replacement with rollback. Standalone: `face_env\Scripts\python.exe src\download_models.py [--model buffalo_l] [--force]` |
+| `src/find_faces.py` | The search/sort script itself (cross-platform; locates CUDA libraries on both Windows and Linux) |
 | `wheels\pycurl-...whl` | Proven pycurl wheel for cp312 (Windows; on Linux it is built from PyPI or falls back to urllib) |
 | `models\models\buffalo_l\` | insightface models (SCRFD detector + w600k_r50 recognizer) + `manifest.json` version stamp |
 | `.cache\` | uv/tmp caches (safe to delete, recreated) |
@@ -88,7 +88,7 @@ the end **verifies the installation itself** (imports + provider versions).
 
 If the install is interrupted — just run it again: it resumes with whatever
 is missing (including resuming an interrupted model archive).
-Download models only: `face_env\Scripts\python.exe download_models.py`
+Download models only: `face_env\Scripts\python.exe src\download_models.py`
 
 ## Run
 

@@ -112,9 +112,9 @@ else
     uvinstall "pycurl" || warn "pycurl build failed (need libcurl-dev/g++). Downloader will use urllib fallback."
 fi
 
-# === 4. InsightFace models (download_models.py is idempotent) =============
+# === 4. InsightFace models (src/download_models.py is idempotent) =============
 step 4 5 "Checking insightface models buffalo_l (download if missing)..."
-"$PYTHON_EXE" "$SCRIPT_DIR/download_models.py" || { err "model download failed - rerun later"; exit 1; }
+"$PYTHON_EXE" "$SCRIPT_DIR/src/download_models.py" || { err "model download failed - rerun later"; exit 1; }
 
 # === 5. Verify (cheap: imports only, no model load) =======================
 step 5 5 "Verifying installation..."

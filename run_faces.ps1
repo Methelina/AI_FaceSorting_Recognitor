@@ -2,7 +2,7 @@
 # AI_FaceRecognitor Launcher
 # ==========================================================
 # Sets isolation env vars, points onnxruntime at the CUDA 12 DLLs
-# shipped with local torch, then runs find_faces.py with all args.
+# shipped with local torch, then runs src/find_faces.py with all args.
 #
 # Usage examples:
 #   .\run_faces.ps1 --help
@@ -29,7 +29,7 @@ if (-not (Test-Path $PythonExe)) {
     Read-Host "Press Enter to exit"; exit 1
 }
 
-& $PythonExe (Join-Path $ScriptPath "find_faces.py") @args
+& $PythonExe (Join-Path $ScriptPath "src/find_faces.py") @args
 
 Write-Host ""
 Write-Host "Press any key to exit..." -ForegroundColor Gray

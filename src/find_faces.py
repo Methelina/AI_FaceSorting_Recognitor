@@ -26,8 +26,9 @@ def resolve_model_root(arg_value: str | None) -> str:
     candidates = []
     if arg_value:
         candidates.append(arg_value)
-    candidates.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                   "models"))
+    # models\ в корне проекта (скрипт лежит в src\)
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates.append(os.path.join(os.path.dirname(here), "models"))
     candidates.append(
         r"K:\work\AI\Comfy_UI_Trellis2\Reposit\ComfyUI\models\insightface")
     for c in candidates:

@@ -6,7 +6,7 @@ rem
 rem  Fully IDEMPOTENT: safe to run repeatedly, finished stages skip.
 rem  Fully SELF-CONTAINED: caches, venv and models live inside the
 rem  project folder. ComfyUI is NOT used or touched. Models download
-rem  from official insightface release via pycurl (download_models.py).
+rem  from official insightface release via pycurl (src/download_models.py).
 rem
 rem  Requires only: cmd.exe + internet (uv downloads Python itself)
 rem ============================================================
@@ -159,9 +159,9 @@ rem === 4. Models ========================================================
 :stage4
 echo.
 echo [Stage 4/5] insightface models buffalo_l (download if missing)
-"%PYTHON_EXE%" "%SCRIPT_DIR%download_models.py"
+"%PYTHON_EXE%" "%SCRIPT_DIR%src/download_models.py"
 if errorlevel 1 (
-    echo  [ERROR] Model download failed - run download_models.py later to retry.
+    echo  [ERROR] Model download failed - run src/download_models.py later to retry.
     goto :fail
 )
 

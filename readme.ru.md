@@ -62,8 +62,8 @@ English version: [readme.md](readme.md)
 
 | Общее | Назначение |
 |---|---|
-| `download_models.py` | Установка/обновление моделей по паттерну opera-proxy: парсер GitHub API → r.jina.ai → хардкоженые зеркала находит `<model>.zip` в свежем релизе, сравнение версий через `manifest.json`, офлайн-режим, докачка pycurl (ретраи + resume), staging-распаковка и атомарная замена с откатом. Отдельно: `face_env\Scripts\python.exe download_models.py [--model buffalo_l] [--force]` |
-| `find_faces.py` | Сам скрипт поиска/сортировки (кроссплатформенный; CUDA-библиотеки находит сам на Windows и Linux) |
+| `src/download_models.py` | Установка/обновление моделей по паттерну opera-proxy: парсер GitHub API → r.jina.ai → хардкоженые зеркала находит `<model>.zip` в свежем релизе, сравнение версий через `manifest.json`, офлайн-режим, докачка pycurl (ретраи + resume), staging-распаковка и атомарная замена с откатом. Отдельно: `face_env\Scripts\python.exe src\download_models.py [--model buffalo_l] [--force]` |
+| `src/find_faces.py` | Сам скрипт поиска/сортировки (кроссплатформенный; CUDA-библиотеки находит сам на Windows и Linux) |
 | `wheels\pycurl-...whl` | Проверенное колесо pycurl для cp312 (Windows; на Linux ставится из PyPI или fallback: urllib) |
 | `models\models\buffalo_l\` | Модели insightface (детектор SCRFD + распознаватель w600k_r50) + `manifest.json` версии |
 | `.cache\` | Кэши uv/tmp (можно удалять, пересоздастся) |
@@ -88,7 +88,7 @@ insightface и остальное (каждый пакет проверяетс�
 
 Если установка оборвалась — просто запустите её снова: продолжится с того,
 чего не хватает (включая докачку оборванного архива моделей).
-Докачать только модели: `face_env\Scripts\python.exe download_models.py`
+Докачать только модели: `face_env\Scripts\python.exe src\download_models.py`
 
 ## Запуск
 
